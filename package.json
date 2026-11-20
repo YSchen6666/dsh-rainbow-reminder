@@ -1,9 +1,8 @@
 {
   "name": "@local/dsh-rainbow-reminder",
-  "version": "3.1.0",
-  "private": true,
+  "version": "3.2.0",
   "type": "module",
-  "description": "DSH 桌面提醒 — 中国云造型，四组祥云按提示类型轮换，屏宽 1/10 顶部居中显示",
+  "description": "DSH 桌面提醒 — 任务等待/错误/完成时在屏幕顶部点亮三色光带，四周同步极光能量场，DSH 在后台也提醒",
   "engines": {
     "dsh": ">= 0.2.2-rc.1"
   },
@@ -16,9 +15,11 @@
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
+  "license": "MIT",
   "files": [
     "index.js",
     "client.js",
+    "trust.js",
     "cordis.patch.yml",
     "desktop/reminder.ps1",
     "desktop/config.json",
@@ -26,8 +27,6 @@
     "desktop/start.ps1",
     "desktop/stop.ps1",
     "desktop/autostart.ps1",
-    "desktop/test-host.mjs",
-    "desktop/verify-done-gate.mjs",
     "locale/zh.json",
     "locale/en.json",
     "icon.svg"

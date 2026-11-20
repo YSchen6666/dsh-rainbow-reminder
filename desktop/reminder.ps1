@@ -2610,7 +2610,9 @@ $Script:Deadline = if ($SelfTest) { (Now-Ms) + $SelfTestMs } else { [int64]::Max
 
 $Script:TimerInstance = New-Object System.Windows.Threading.DispatcherTimer
 $Script:TimerInstance.Interval = [TimeSpan]::FromMilliseconds([double] $Script:Cfg.pollMs)
+$Script:TickErrCount = 0
 $Script:TimerInstance.Add_Tick({
+ try {
   $now = Now-Ms
   if ($Script:Stop -or $now -gt $Script:Deadline) {
     $Script:TimerInstance.Stop()
@@ -2673,7 +2675,23 @@ $Script:TimerInstance.Add_Tick({
     $Script:NextTrayMs = $now + 1500
     Set-TrayText
   }
+ } catch {
+  # 顶层兜底：记日志、限流（前 5 次全记，之后每 50 次记一次），绝不退出进程。
+  $Script:TickErrCount = $Script:TickErrCount + 1
+  if ($Script:TickErrCount -le 5 -or ($Script:TickErrCount % 50) -eq 0) {
+    Write-AssistLog ("main tick error #{0}: {1}" -f $Script:TickErrCount, $_.Exception.Message)
+  }
+ }
 })
+
+# Dispatcher 级兜底：任何漏网的异常只记日志并标记已处理，进程存活优先。
+try {
+  [System.Windows.Threading.Dispatcher]::CurrentDispatcher.add_UnhandledException({
+    param($s, $e)
+    try { Write-AssistLog ("dispatcher unhandled: {0}" -f $e.Exception.Message) } catch { }
+    $e.Handled = $true
+  })
+} catch { Write-AssistLog "cannot register UnhandledException handler" }
 $Script:TimerInstance.Start()
 
 # ── 独立 30fps 动画定时器（第一性原理：流畅度是「惊艳」的前提）──────────────

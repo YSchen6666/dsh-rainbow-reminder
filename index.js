@@ -42,6 +42,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { rejectionFor, connectionAdmissionView } from './trust.js'
 
 const NS = 'rainbow-reminder'
 const MAX_BYTES = 2 * 1024 * 1024
@@ -182,6 +183,12 @@ function superviseAssistant(logger) {
 export function apply(ctx, config) {
   const logger = ctx.logger ?? console
   const sessions = ctx.get?.('sessions')
+  // Trust fence: the exact routes below are longer than the kernel's `/api`
+  // prefix, so webServer dispatch may answer them *before* the connection
+  // service's own admission check. Look the service up per request (it is
+  // published after plugins load) and run the same fence our-free-model runs.
+  const optional = (service) => (typeof ctx.get === 'function' ? ctx.get(service) : undefined)
+  const fenceConnection = connectionAdmissionView(() => optional('connection'))
 
   const quietMs = Number.isFinite(config?.quietMs) && config.quietMs >= 0 ? config.quietMs : 1200
   const desktopAssistant = config?.desktopAssistant !== false // on by default
@@ -653,9 +660,12 @@ export function apply(ctx, config) {
   }, { global: true })
 
   // ── browser poll route ────────────────────────────────────────────────────
-  // The page cannot read the JSONL file, so it long-polls this. Same-origin
-  // only: `webServer` dispatch already runs behind the app's admission fence,
-  // and the response carries nothing but the kinds this plugin just emitted.
+  // The page cannot read the JSONL file, so it long-polls this. Every route
+  // runs the trust fence first: the connection service's own admission decision
+  // when present, otherwise the structural replica in trust.js (loopback host,
+  // no cross-site fetches, matching Origin/Referer). Exact routes under
+  // /api/rainbow-reminder/ are longer than the kernel's /api prefix and can be
+  // dispatched before the kernel's fence, so the plugin must carry its own.
   ctx.inject(['webServer'], (scoped) => {
     const server = scoped.webServer
     if (server === undefined || typeof server.register !== 'function') {
@@ -663,8 +673,19 @@ export function apply(ctx, config) {
       return
     }
     const route = (path, handler) => {
+      const fenced = (req, res) => {
+        const rejection = rejectionFor(req, fenceConnection, (d) =>
+          logger.info?.(`rainbow-reminder: rejected ${d?.source}/${d?.reason} on ${path}`))
+        if (rejection !== undefined) {
+          res.writeHead(rejection, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' })
+          return res.end(JSON.stringify({
+            error: rejection === 401 ? 'unauthorized' : rejection === 503 ? 'admission unavailable' : 'forbidden',
+          }))
+        }
+        return handler(req, res)
+      }
       try {
-        scoped.effect(() => server.register({ kind: 'exact', path, handler }), `rainbow-reminder: ${path}`)
+        scoped.effect(() => server.register({ kind: 'exact', path, handler: fenced }), `rainbow-reminder: ${path}`)
         logger.info?.(`rainbow-reminder: route ${path}`)
       } catch (err) {
         logger.warn?.(`rainbow-reminder: cannot mount ${path}: ${err?.message ?? err}`)

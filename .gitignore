@@ -5,7 +5,6 @@ node_modules/
 
 # 本地状态与运行时数据（不进入开源仓库）
 desktop/config.local.json
-%LOCALAPPDATA%/
 
 # 个人工作空间 / 非插件本体（一律不进入开源仓库）
 .dsh/
@@ -45,9 +44,12 @@ desktop/assets/gen-*.py
 desktop/assets/settings-window.png
 desktop/assets/cloud-*-clean.png
 desktop/assets/cloud-ref*.png
+# 祥云贴图系从第三方带水印截图抠底衍生的素材，版权未确认，不进入开源仓库
+# （本地可用；开源版云图功能默认关闭，无贴图时不受影响）
+desktop/assets/cloud-*-keyed.png
+desktop/assets/cloud-keyed.png
 ocr_image.ps1
 push.js
-trust.js
 rollback-*.cmd
 rollback-*.mjs
 enable-rainbow.cmd
