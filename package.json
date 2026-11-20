@@ -1,0 +1,45 @@
+{
+  "name": "@local/dsh-rainbow-reminder",
+  "version": "3.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DSH 桌面提醒 — 中国云造型，四组祥云按提示类型轮换，屏宽 1/10 顶部居中显示",
+  "engines": {
+    "dsh": ">= 0.2.2-rc.1"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-plugin-manager": "*"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "desktop/reminder.ps1",
+    "desktop/config.json",
+    "desktop/fix-bom.ps1",
+    "desktop/start.ps1",
+    "desktop/stop.ps1",
+    "desktop/autostart.ps1",
+    "desktop/test-host.mjs",
+    "desktop/verify-done-gate.mjs",
+    "locale/zh.json",
+    "locale/en.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
+    }
+  }
+}

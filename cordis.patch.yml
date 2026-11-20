@@ -1,0 +1,13 @@
+- insert:
+    - id: rainbow-reminder
+      name: '@local/dsh-rainbow-reminder'
+      config:
+        signalDir: ''
+        quietMs: 1200
+        desktopAssistant: true
+        # v13 提示策略：只有整个对话真的做完才亮"任务完成"。
+        # 想回到"每个回合都亮"的旧行为，把 onlyWhenAllTasksDone 设为 false。
+        alertPolicy:
+          onlyWhenAllTasksDone: true   # 本回合计划还有未完成项 → 不亮
+          fromSubagents: false         # 子会话不自己宣布完成，父对话负责
+          quietJobsDuringTurn: true     # 干活期间 job 结算不提示

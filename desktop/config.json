@@ -1,0 +1,238 @@
+﻿{
+    "$schemaVersion":  2,
+    "profile":  "banner",
+    "screen":  "primary",
+    "backdrop":  {
+                     "enabled":  true,
+                     "color":  "#0A0E14",
+                     "opacity":  0.35,
+                     "height":  26
+                 },
+    "hairline":  {
+                     "enabled":  true,
+                     "thickness":  2,
+                     "opacity":  1.0
+                 },
+    "dot":  {
+                "enabled":  true,
+                "size":  6,
+                "opacity":  0.95
+            },
+    "label":  {
+                  "enabled":  true,
+                  "font":  "Consolas",
+                  "size":  11.5,
+                  "opacity":  0.92,
+                  "color":  "#C9D4E2",
+                  "showTime":  true,
+                  "showSession":  true,
+                  "paddingLeft":  10
+              },
+    "motion":  {
+                   "fadeInMs":  180,
+                   "fadeOutMs":  260,
+                   "colorTweenMs":  220,
+                   "pulseMs":  2600,
+                   "pulseDepth":  0.9
+               },
+    "typeAlphaScale":  1,
+    "quietMs":  1200,
+    "globalThrottleMs":  500,
+    "sound":  {
+                  "enabled":  true,
+                  "volume":  0.6,
+                  "speak":  false
+              },
+    "endpoint":  {
+                     "preferEnv":  true,
+                     "cacheFile":  true,
+                     "rediscoverMs":  20000,
+                     "healthPath":  "/api/rainbow-reminder/health",
+                     "eventsPath":  "/api/rainbow-reminder/events"
+                 },
+    "fallback":  {
+                     "enabled":  true,
+                     "signalFile":  "",
+                     "pollMs":  800,
+                     "maxBytes":  2097152
+                 },
+    "kinds":  {
+                  "approval":  {
+                                   "color":  "#FFB454",
+                                   "label":  "等待授权",
+                                   "labelEn":  "APPROVAL",
+                                   "holdMs":  0,
+                                   "maxHoldMs":  7200000,
+                                   "priority":  90,
+                                   "pulse":  true,
+                                   "sound":  "question"
+                               },
+                  "question":  {
+                                   "color":  "#FFB454",
+                                   "label":  "等待回答",
+                                   "labelEn":  "QUESTION",
+                                   "holdMs":  0,
+                                   "maxHoldMs":  600000,
+                                   "priority":  80,
+                                   "pulse":  true,
+                                   "sound":  "question"
+                               },
+                  "error":  {
+                                "color":  "#FF6B6B",
+                                "label":  "任务出错",
+                                "labelEn":  "ERROR",
+                                "holdMs":  0,
+                                "maxHoldMs":  7200000,
+                                "priority":  70,
+                                "pulse":  true,
+                                "sound":  "hand"
+                            },
+                  "blocked":  {
+                                  "color":  "#FF3030",
+                                  "label":  "任务无法继续",
+                                  "labelEn":  "BLOCKED",
+                                  "holdMs":  0,
+                                  "maxHoldMs":  7200000,
+                                  "priority":  85,
+                                  "pulse":  true,
+                                  "sound":  "hand"
+                              },
+                  "waiting":  {
+                                  "color":  "#FFB454",
+                                  "label":  "等待处理",
+                                  "labelEn":  "WAITING",
+                                  "holdMs":  0,
+                                  "maxHoldMs":  7200000,
+                                  "priority":  60,
+                                  "pulse":  true,
+                                  "sound":  "none"
+                              },
+                  "team":  {
+                               "color":  "#9D8CFF",
+                               "label":  "队友消息",
+                               "labelEn":  "TEAM",
+                               "holdMs":  6000,
+                               "maxHoldMs":  8000,
+                               "priority":  45,
+                               "pulse":  true,
+                               "sound":  "none"
+                           },
+                  "done":  {
+                               "color":  "#35D07F",
+                               "label":  "任务完成",
+                               "labelEn":  "DONE",
+                               "holdMs":  0,
+                               "maxHoldMs":  7200000,
+                               "priority":  40,
+                               "pulse":  true,
+                               "sound":  "ok"
+                           },
+                  "jobs":  {
+                               "color":  "#8E9BA8",
+                               "label":  "后台任务结束",
+                               "labelEn":  "JOBS",
+                               "holdMs":  6000,
+                               "maxHoldMs":  8000,
+                               "priority":  30,
+                               "pulse":  true,
+                               "sound":  "none"
+                           },
+                  "schedule":  {
+                                   "color":  "#C792EA",
+                                   "label":  "定时任务触发",
+                                   "labelEn":  "SCHEDULE",
+                                   "holdMs":  6000,
+                                   "maxHoldMs":  8000,
+                                   "priority":  30,
+                                   "pulse":  true,
+                                   "sound":  "none"
+                               },
+                  "default":  {
+                                  "color":  "#56D4E0",
+                                  "label":  "DSH 提示",
+                                  "labelEn":  "DSH",
+                                  "holdMs":  6000,
+                                  "maxHoldMs":  8000,
+                                  "priority":  20,
+                                  "pulse":  true,
+                                  "sound":  "none"
+                              }
+              },
+    "minimal":  {
+                    "backdrop":  {
+                                     "opacity":  0.0
+                                 },
+                    "label":  {
+                                  "enabled":  false
+                              },
+                    "hairline":  {
+                                     "thickness":  3
+                                 },
+                    "dot":  {
+                                "enabled":  false
+                            },
+                    "height":  10
+                },
+    "autoDismiss":  {
+                        "dwellMs":  800,
+                        "processMatch":  [
+                                             "DeepSeek Harness"
+                                         ],
+                        "titleMatch":  [
+                                           "DeepSeek Harness"
+                                       ],
+                        "enabled":  true
+                    },
+    "cloud":  {
+                  "widthFraction":  0.131232876712329,
+                  "opacity":  0.92,
+                  "centerX":  0.5,
+                  "labelInside":  true,
+                  "enabled":  false
+              },
+    "screenGlow":  {
+                       "enabled":  true,
+                       "color":  "#FFB454",
+                       "opacity":  0.16
+                   },
+    "errorCloud":  {
+                       "enabled":  false,
+                       "widthFraction":  0.163424657534247,
+                       "opacity":  0.465570776255708,
+                       "marginRight":  0.02,
+                       "marginTop":  0.03,
+                       "glowColor":  "#FF3030",
+                       "glowOpacity":  0.0775342465753426
+                   },
+    "doneCloud":  {
+                      "enabled":  false,
+                      "widthFraction":  0.1,
+                      "opacity":  0.92,
+                      "marginLeft":  0.03,
+                      "marginTop":  0.03,
+                      "fadeInMs":  700,
+                      "fadeOutMs":  900,
+                      "glowOpacity":  0.14,
+                      "glowColor":  "#35D07F"
+                  },
+    "edgeGlow":  {
+                     "enabled":  true,
+                     "borderPx":  3,
+                     "glowPx":  30,
+                     "sweepPx":  8,
+                     "corePx":  2,
+                     "cycleMs":  5101.3698630137,
+                     "flowSpeed":  0.42,
+                     "cometTail":  0.2,
+                     "hueDrift":  6,
+                     "opacity":  0.759315068493151,
+                     "kindColors":  {
+                                        "approval":  "#FFB454",
+                                        "question":  "#FFB454",
+                                        "waiting":  "#FFB454",
+                                        "done":  "#35D07F",
+                                        "error":  "#FF6B6B",
+                                        "blocked":  "#FF3030"
+                                    }
+                 }
+}

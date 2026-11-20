@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "DSH desktop reminder",
+    "description": "One color per kind: a hairline band at the top of the screen — amber for approval, green for done, coral for errors; the backdrop is transparent and adjustable."
+  },
+  "rainbowReminder": {
+    "meta.title": "DSH desktop reminder",
+    "meta.description": "One color per kind: a hairline band at the top of the screen — amber for approval, green for done, coral for errors; the backdrop is transparent and adjustable.",
+    "sound.locked": "Click anywhere to enable the chime"
+  }
+}

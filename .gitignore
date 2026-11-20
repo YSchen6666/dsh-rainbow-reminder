@@ -1,0 +1,60 @@
+# 依赖与构建产物
+node_modules/
+*.log
+*.tmp
+
+# 本地状态与运行时数据（不进入开源仓库）
+desktop/config.local.json
+%LOCALAPPDATA%/
+
+# 个人工作空间 / 非插件本体（一律不进入开源仓库）
+.dsh/
+.dsh-created-plugins/
+.acl-report/
+_src/
+_dsh_src/
+任务台账/
+_backup*/
+audit_json/
+TASK-*/
+solo-to-team/
+微刊/
+DESIGN.md
+洞见卡_*.md
+BUG审核报告.md
+使用说明.md
+
+# DSH 内部源码 dump（版权材料，严禁开源）
+desktop/_asar-dump/
+desktop/_asar-tree.txt
+desktop/_spa-bundle.txt
+desktop/_demo/
+
+# 临时与调试脚本
+desktop/_*.mjs
+desktop/*.bak
+desktop/reminder.beanbao-working.ps1
+desktop/reminder.before-rewrite.ps1
+desktop/reminder.flow-v1.ps1
+desktop/test-host.mjs
+desktop/verify-done-gate.mjs
+desktop/assets/_*/
+desktop/assets/dewatermark.ps1
+desktop/assets/gen-*.ps1
+desktop/assets/gen-*.py
+desktop/assets/settings-window.png
+desktop/assets/cloud-*-clean.png
+desktop/assets/cloud-ref*.png
+ocr_image.ps1
+push.js
+trust.js
+rollback-*.cmd
+rollback-*.mjs
+enable-rainbow.cmd
+
+# 设计稿与演示素材（保留插件运行必需的祥云贴图）
+*.jpg
+*.gif
+*.mp4
+桌面提醒_*.png
+scaled_*.jpg
