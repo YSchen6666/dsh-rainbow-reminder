@@ -509,6 +509,22 @@ function Get-DisplayRect {
   return @{ L = $s.Bounds.X; T = $s.Bounds.Y; R = $s.Bounds.Right; B = $s.Bounds.Bottom; W = $s.Bounds.Width; H = $s.Bounds.Height; Device = $s.DeviceName }
 }
 
+# 显示器拓扑同步：比较完整矩形（含 R/B 宽高），检测插拔/分辨率/主副屏变化。
+# 返回 $true 表示目标矩形发生变化；调用方据此可主动重定位窗口。
+function Sync-DisplayRect {
+  $newRect = Get-DisplayRect
+  $old = $Script:PhysRect
+  $sigNew = '{0}|{1},{2},{3},{4}' -f $newRect.Device, $newRect.L, $newRect.T, $newRect.R, $newRect.B
+  $sigOld = ''
+  if ($null -ne $old) { $sigOld = '{0}|{1},{2},{3},{4}' -f $old.Device, $old.L, $old.T, $old.R, $old.B }
+  if ($sigNew -ne $sigOld) {
+    $Script:PhysRect = $newRect
+    Write-AssistLog ("display topology changed -> {0} rect=({1},{2})-({3},{4})" -f $newRect.Device, $newRect.L, $newRect.T, $newRect.R, $newRect.B)
+    return $true
+  }
+  return $false
+}
+
 try { $dpi = [DshRem.Native]::DpiX() } catch { $dpi = 96 }
 $toDip = 96.0 / [double] $dpi
 foreach ($s in [System.Windows.Forms.Screen]::AllScreens) { Write-AssistLog ("screen: {0} {1}" -f $s.DeviceName, $s.Bounds) }
@@ -1863,12 +1879,7 @@ function Set-ScreenDisplay([string] $v) {
     $disk.screen = $d
     ($disk | ConvertTo-Json -Depth 12) | Set-Content -LiteralPath $ConfigPath -Encoding UTF8
     # 立即重定位（与热加载同一逻辑）
-    $newRect = Get-DisplayRect
-    if ($Script:PhysRect.Device -ne $newRect.Device) {
-      $Script:PhysRect = $newRect
-      # 边框闪烁窗口会在下一帧 Render-BorderFlash 中自动重定位
-      Write-AssistLog ("display target changed -> {0} rect=({1},{2})-({3},{4})" -f $newRect.Device, $newRect.L, $newRect.T, $newRect.R, $newRect.B)
-    }
+    [void] (Sync-DisplayRect)
     Render
   } catch { Write-AssistLog ("screen persist failed: {0}" -f $_.Exception.Message) }
 }
@@ -2539,10 +2550,11 @@ function Invoke-Demo {
 # 9. 启动窗口 + 主循环
 # ---------------------------------------------------------------------------
 $v0 = Get-ViewCfg
+$initRect = Get-DisplayRect
 foreach ($lane in $Script:Lanes) {
-  $lane.window.Left = 0
-  $lane.window.Top = 0
-  $lane.window.Width = $Script:BandWidthDip
+  $lane.window.Left = [double] $initRect.L
+  $lane.window.Top = [double] $initRect.T
+  $lane.window.Width = [double] $initRect.W
   $lane.window.Height = [double] $v0.backdrop.height
   $lane.window.Opacity = 0
   $lane.image.Visibility = [System.Windows.Visibility]::Collapsed
@@ -2638,16 +2650,25 @@ $Script:TimerInstance.Add_Tick({
   if ($now -ge $Script:NextCfgMs) {
     $Script:NextCfgMs = $now + 1000
     Write-PidHeartbeat
+    # 每秒检测显示器拓扑变化（分辨率/插拔/主副屏切换），不再依赖配置文件是否变化。
+    # 检测到变化时立即主动重定位：不依赖 30fps 动画帧是否正在运行
+    # （旧版仅靠动画帧定位，帧一旦异常，窗口就会永久卡在旧屏幕坐标/尺寸上）。
+    try {
+      if (Sync-DisplayRect) {
+        $drNow = $Script:PhysRect
+        $bfwNow = $Script:BorderFlash.window
+        $bfwNow.Left   = [double] $drNow.L
+        $bfwNow.Top    = [double] $drNow.T
+        $bfwNow.Width  = [double] $drNow.W
+        $bfwNow.Height = [double] $drNow.H
+      }
+    } catch { }
     try {
       if ((Test-Path -LiteralPath $ConfigPath) -and (Get-Item -LiteralPath $ConfigPath).LastWriteTimeUtc -ne $Script:CfgStamp) {
         if (Read-Config) {
           $Script:TimerInstance.Interval = [TimeSpan]::FromMilliseconds([double] $Script:Cfg.pollMs)
-          # 目标显示器改变时，边框闪烁窗口会在下一帧 Render-BorderFlash 中自动重定位
-          $newRect = Get-DisplayRect
-          if ($Script:PhysRect.Device -ne $newRect.Device -or $Script:PhysRect.L -ne $newRect.L -or $Script:PhysRect.T -ne $newRect.T) {
-            $Script:PhysRect = $newRect
-            Write-AssistLog ("display target changed -> {0} rect=({1},{2})-({3},{4})" -f $newRect.Device, $newRect.L, $newRect.T, $newRect.R, $newRect.B)
-          }
+          # 配置可能改了 screen 目标，立刻再同步一次
+          [void] (Sync-DisplayRect)
           Write-AssistLog 'config reloaded'
           Show-TrayTip 'DSH 提醒' '配置已热加载'
         } else {
